@@ -14,16 +14,14 @@
 
     // Function to clone an element and apply inline styles recursively
     function cloneWithStyles(element) {
-        const clone = element.cloneNode(true);  // Deep clone the element
+        const clone = element.cloneNode(true); // Deep clone the element
         applyStylesRecursively(clone, element);
         return clone;
     }
 
     // Recursively apply inline styles to an element and its children
     function applyStylesRecursively(clone, original) {
-        const computedStyle = window.getComputedStyle(original);
         clone.style.cssText = getInlineStyles(original);
-
         const children = Array.from(clone.children);
         const originalChildren = Array.from(original.children);
 
@@ -32,12 +30,12 @@
         }
     }
 
-    // Function to gather relevant CSS rules that apply to the element and its children
+    // Function to gather relevant CSS rules that apply to the element
     function getCSSRulesForElement(element) {
         let cssRules = '';
         for (const sheet of document.styleSheets) {
             try {
-                if (!sheet.cssRules) continue;  // Some external stylesheets might block access
+                if (!sheet.cssRules) continue; // Some stylesheets might block access
 
                 for (const rule of sheet.cssRules) {
                     if (element.matches(rule.selectorText)) {
@@ -45,7 +43,6 @@
                     }
                 }
             } catch (e) {
-                // Handle CORS issue
                 console.warn("Cannot access CSS stylesheet:", e);
             }
         }
@@ -55,11 +52,11 @@
     // Function to highlight the element with a red dashed border
     function highlightElement(e) {
         if (lastElement) {
-            lastElement.style.outline = lastOutline;  // Restore the last element's outline
+            lastElement.style.outline = lastOutline; // Restore the last element's outline
         }
         lastElement = e.target;
         lastOutline = lastElement.style.outline;
-        lastElement.style.outline = '2px dashed red';  // Set red dashed outline
+        lastElement.style.outline = '2px dashed red'; // Set red dashed outline
     }
 
     // Function to handle the click event and download the HTML
@@ -67,8 +64,9 @@
         e.preventDefault();
         const element = e.target;
 
-        // Clone the element and capture inline styles
+        // Clone the element and capture inline styles, but remove the outline
         const clonedElement = cloneWithStyles(element);
+        clonedElement.style.outline = ''; // Remove the red dashed outline
 
         // Capture external CSS styles
         const externalCSS = getCSSRulesForElement(element);
