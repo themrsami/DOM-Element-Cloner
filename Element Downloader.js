@@ -1,4 +1,4 @@
-(function() {
+(function () {
     let lastElement = null;
     let lastOutline = '';
 
@@ -64,9 +64,12 @@
         e.preventDefault();
         const element = e.target;
 
+        // Remove the red outline before cloning the element for download
+        lastElement.style.outline = lastOutline; 
+
         // Clone the element and capture inline styles, but remove the outline
         const clonedElement = cloneWithStyles(element);
-        clonedElement.style.outline = ''; // Remove the red dashed outline
+        clonedElement.style.outline = ''; // Remove the red dashed outline from the downloaded element
 
         // Capture external CSS styles
         const externalCSS = getCSSRulesForElement(element);
@@ -95,11 +98,10 @@
 
         // Clean up
         URL.revokeObjectURL(url);
-        document.removeEventListener('mouseover', highlightElement);
-        document.removeEventListener('click', handleClick);
     }
 
     // Add event listeners for hover and click
     document.addEventListener('mouseover', highlightElement);
     document.addEventListener('click', handleClick);
+
 })();
