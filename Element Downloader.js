@@ -12,10 +12,42 @@
         return inlineStyles;
     }
 
+    // Function to convert relative URLs to absolute URLs
+    function convertRelativePaths(clone) {
+        const baseUrl = window.location.origin;
+
+        // Convert relevant attributes to absolute paths
+        const attributesToConvert = ['src', 'href', 'data-src', 'data-href']; // Add more as necessary
+        attributesToConvert.forEach(attr => {
+            if (clone.hasAttribute(attr)) {
+                const value = clone.getAttribute(attr);
+                if (value.startsWith('/')) {
+                    // Convert root-relative paths
+                    clone.setAttribute(attr, baseUrl + value);
+                } else if (!value.startsWith('http') && !value.startsWith('https')) {
+                    // Convert relative paths
+                    clone.setAttribute(attr, new URL(value, baseUrl).href);
+                }
+            }
+        });
+
+        // Specifically handle <img> tags to ensure their src attributes are absolute
+        if (clone.tagName.toLowerCase() === 'img') {
+            const src = clone.getAttribute('src');
+            if (src && (src.startsWith('/') || !src.startsWith('http'))) {
+                clone.setAttribute('src', new URL(src, baseUrl).href);
+            }
+        }
+
+        // Recursively check all children for <img> tags
+        Array.from(clone.children).forEach(child => convertRelativePaths(child));
+    }
+
     // Function to clone an element and apply inline styles recursively
     function cloneWithStyles(element) {
         const clone = element.cloneNode(true); // Deep clone the element
         applyStylesRecursively(clone, element);
+        convertRelativePaths(clone); // Convert relative paths after cloning
         return clone;
     }
 
